@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>紅白對抗賽 — 投票</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    /* ── 待機畫面 ── */
+    #screen-waiting {
+      text-align: center;
+    }
+    #screen-waiting .logo { font-size: 4rem; margin-bottom: 16px; }
+    #screen-waiting h1 { font-size: 1.6rem; color: #e94560; margin-bottom: 8px; }
+    #screen-waiting p { color: #888; font-size: 0.95rem; }
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid #0f3460;
+      border-top-color: #e94560; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 20px auto 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── 投票畫面 ── */
+    #screen-voting { width: 100%; max-width: 560px; display: none; flex-direction: column; align-items: center; }
+    .round-tag { background: #e94560; color: white; font-size: 0.8rem; font-weight: bold; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; letter-spacing: 1px; }
+    .title-row { font-size: 1.1rem; color: #aaa; margin-bottom: 16px; }
+    .works-row { display: flex; gap: 12px; width: 100%; }
+    .work-block { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .work-img-wrap { width: 100%; background: #0f3460; border-radius: 12px; overflow: hidden; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; cursor: zoom-in; position: relative; }
+    .work-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .zoom-hint { font-size: 0.7rem; color: #888; text-align: center; margin-top: 2px; letter-spacing: 0.5px; }
+
+    /* Lightbox */
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 95vw; max-height: 88vh; object-fit: contain; border-radius: 8px; }
+    #lightbox-close { position: absolute; top: 16px; right: 20px; font-size: 2rem; color: #fff; cursor: pointer; line-height: 1; }
+    #lightbox-tip { color: #888; font-size: 0.8rem; margin-top: 10px; }
+    .work-label { font-size: 1rem; font-weight: bold; color: #fff; text-align: center; }
+    .vote-btn {
+      width: 100%; padding: 14px 0; border: none; border-radius: 12px;
+      font-size: 1.1rem; font-weight: bold; font-family: inherit;
+      cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+      letter-spacing: 1px;
+    }
+    .vote-btn:active { transform: scale(0.96); }
+    .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-a { background: linear-gradient(135deg, #e94560, #c62a47); color: white; }
+    .btn-b { background: linear-gradient(135deg, #0f3460, #1a5276); color: white; }
+
+    /* 已投票狀態 */
+    .voted-overlay {
+      width: 100%; text-align: center; padding: 20px;
+      background: rgba(255,255,255,0.05); border-radius: 12px;
+      margin-top: 8px;
+    }
+    .voted-overlay .check { font-size: 2.5rem; }
+    .voted-overlay p { color: #aaa; font-size: 0.9rem; margin-top: 4px; }
+
+    /* ── 結算畫面 ── */
+    #screen-result { display: none; text-align: center; max-width: 400px; }
+    #screen-result .icon { font-size: 3rem; margin-bottom: 12px; }
+    #screen-result h2 { font-size: 1.3rem; color: #e94560; margin-bottom: 8px; }
+    #screen-result p { color: #888; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<!-- 待機 -->
+<div id="screen-waiting">
+  <div class="logo">🎨</div>
+  <h1>紅白對抗賽</h1>
+  <p>等待老師開始下一回合...</p>
+  <div class="spinner"></div>
+</div>
+
+<!-- 投票 -->
+<div id="screen-voting">
+  <div class="round-tag" id="round-tag">第 1 回合</div>
+  <div class="title-row">選出你心目中更棒的那件！</div>
+  <div class="works-row">
+    <div class="work-block">
+      <div class="work-img-wrap" onclick="openLightbox('a')"><img id="img-a" src="" alt="作品A"></div>
+      <div class="zoom-hint">🔍 點圖放大</div>
+      <div class="work-label" id="label-a">—</div>
+      <button class="vote-btn btn-a" id="btn-a" onclick="vote('A')">👈 投這件</button>
+    </div>
+    <div class="work-block">
+      <div class="work-img-wrap" onclick="openLightbox('b')"><img id="img-b" src="" alt="作品B"></div>
+      <div class="zoom-hint">🔍 點圖放大</div>
+      <div class="work-label" id="label-b">—</div>
+      <button class="vote-btn btn-b" id="btn-b" onclick="vote('B')">投這件 👉</button>
+    </div>
+  </div>
+  <div class="voted-overlay" id="voted-msg" style="display:none">
+    <div class="check">✅</div>
+    <p>你已投票，等待老師結算</p>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+  <span id="lightbox-close">✕</span>
+  <img id="lightbox-img" src="" alt="">
+  <div id="lightbox-tip">點任意處關閉</div>
+</div>
+
+<!-- 結算後等待 -->
+<div id="screen-result">
+  <div class="icon">⏳</div>
+  <h2>本回合結束</h2>
+  <p>等待下一回合開始...</p>
+</div>
+
+<script>
+// ── Lightbox ──
+function openLightbox(side) {
+  const src = document.getElementById('img-' + side).src;
+  if (!src) return;
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ── Supabase 設定（內嵌，不依賴 config.js）──
+const SUPABASE_URL = 'https://cnizzgyievmsqdglftrh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8_fQGxMNZfoypvHQQGsL6w_cqhvvNXz';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentMatchId = null;
+let hasVoted = false;
+let lastStatus = null;
+
+// 讀取本地已投票記錄
+function getVotedMatches() {
+  try { return JSON.parse(localStorage.getItem('pk_voted') || '{}'); } catch { return {}; }
+}
+function markVoted(matchId) {
+  const v = getVotedMatches();
+  v[matchId] = true;
+  localStorage.setItem('pk_voted', JSON.stringify(v));
+}
+function alreadyVoted(matchId) {
+  return !!getVotedMatches()[matchId];
+}
+
+async function vote(choice) {
+  if (hasVoted || !currentMatchId) return;
+  document.getElementById('btn-a').disabled = true;
+  document.getElementById('btn-b').disabled = true;
+
+  // 產生 voter token（簡單防重複：本次頁面 session）
+  const voterToken = localStorage.getItem('pk_token') || (() => {
+    const t = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('pk_token', t);
+    return t;
+  })();
+
+  const { error } = await sb.from('votes').insert({
+    match_id: currentMatchId,
+    choice: choice,
+    voter_token: voterToken
+  });
+
+  if (error) {
+    console.error(error);
+    document.getElementById('btn-a').disabled = false;
+    document.getElementById('btn-b').disabled = false;
+    return;
+  }
+
+  markVoted(currentMatchId);
+  hasVoted = true;
+  document.getElementById('voted-msg').style.display = 'block';
+}
+
+function showScreen(name) {
+  document.getElementById('screen-waiting').style.display = name === 'waiting' ? 'block' : 'none';
+  document.getElementById('screen-voting').style.display  = name === 'voting'  ? 'flex'  : 'none';
+  document.getElementById('screen-result').style.display  = name === 'result'  ? 'block' : 'none';
+}
+
+async function poll() {
+  const { data, error } = await sb.from('system_state').select('*').eq('id', 'current').single();
+  if (error || !data) return;
+
+  const newMatchId = data.match_id;
+  const status = data.status;
+
+  if (status === 'voting') {
+    // 切換到新回合？重置投票狀態
+    if (newMatchId !== currentMatchId) {
+      currentMatchId = newMatchId;
+      hasVoted = alreadyVoted(newMatchId);
+
+      // 填入作品資訊
+      const ma = data.match_a || {};
+      const mb = data.match_b || {};
+      document.getElementById('img-a').src = ma.image_url || '';
+      document.getElementById('img-b').src = mb.image_url || '';
+      document.getElementById('label-a').textContent = ma.filename || '作品 A';
+      document.getElementById('label-b').textContent = mb.filename || '作品 B';
+      document.getElementById('round-tag').textContent = `第 ${data.round_number} 回合`;
+
+      document.getElementById('btn-a').disabled = hasVoted;
+      document.getElementById('btn-b').disabled = hasVoted;
+      document.getElementById('voted-msg').style.display = hasVoted ? 'block' : 'none';
+    }
+    showScreen('voting');
+  } else {
+    // waiting 或其他
+    currentMatchId = null;
+    // 如果上一次是 voting → 短暫顯示「結束」畫面
+    if (lastStatus === 'voting') {
+      showScreen('result');
+      setTimeout(() => showScreen('waiting'), 2500);
+    } else if (lastStatus !== 'waiting') {
+      showScreen('waiting');
+    }
+  }
+
+  lastStatus = status;
+}
+
+// 啟動輪詢
+poll();
+setInterval(poll, 3000);
+</script>
+</body>
+</html>
