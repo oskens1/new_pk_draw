@@ -36,7 +36,24 @@
     }
     #login-btn:hover { opacity: 0.85; }
     #login-err { color: #f44336; font-size: 0.85rem; margin-top: 10px; min-height: 20px; }
-    h1 { text-align: center; padding: 20px; font-size: 1.8rem; color: #e94560; letter-spacing: 2px; }
+
+    h1 { text-align: center; padding: 20px 20px 8px; font-size: 1.8rem; color: #e94560; letter-spacing: 2px; }
+
+    /* ── 頻道切換 ── */
+    #channel-bar {
+      display: flex; justify-content: center; align-items: center;
+      gap: 12px; padding: 8px 0 16px;
+    }
+    .ch-label { color: #888; font-size: 0.95rem; }
+    .ch-btn {
+      padding: 8px 28px; border: 2px solid #0f3460; border-radius: 24px;
+      background: transparent; color: #aaa;
+      font-size: 1rem; font-family: inherit; font-weight: bold;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .ch-btn.active { background: #e94560; border-color: #e94560; color: white; }
+    .ch-btn:hover:not(.active) { border-color: #e94560; color: #e94560; }
+
     .container { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
 
     /* 分區 */
@@ -113,45 +130,31 @@
 
     /* ── QR Code 側邊抽屜 ── */
     #qr-tab {
-      position: fixed;
-      right: 0;
-      top: 50%;
+      position: fixed; right: 0; top: 50%;
       transform: translateY(-50%);
-      background: #e94560;
-      color: white;
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      padding: 16px 10px;
-      border-radius: 8px 0 0 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      z-index: 1000;
-      user-select: none;
+      background: #e94560; color: white;
+      writing-mode: vertical-rl; text-orientation: mixed;
+      padding: 16px 10px; border-radius: 8px 0 0 8px;
+      cursor: pointer; font-size: 0.9rem; font-weight: bold;
+      letter-spacing: 2px; z-index: 1000; user-select: none;
       transition: background 0.2s;
       box-shadow: -2px 0 8px rgba(0,0,0,0.4);
     }
     #qr-tab:hover { background: #c62a47; }
-
     #qr-drawer {
-      position: fixed;
-      right: -280px;
-      top: 50%;
+      position: fixed; right: -300px; top: 50%;
       transform: translateY(-50%);
-      width: 260px;
-      background: #16213e;
-      border: 1px solid #0f3460;
-      border-radius: 12px 0 0 12px;
-      padding: 20px;
-      z-index: 999;
+      width: 280px; background: #16213e;
+      border: 1px solid #0f3460; border-radius: 12px 0 0 12px;
+      padding: 20px; z-index: 999;
       transition: right 0.3s ease;
       box-shadow: -4px 0 20px rgba(0,0,0,0.5);
       text-align: center;
     }
     #qr-drawer.open { right: 0; }
     #qr-drawer h3 { color: #e94560; font-size: 1rem; margin-bottom: 4px; }
-    #qr-drawer .qr-url { font-size: 0.7rem; color: #888; margin-bottom: 14px; word-break: break-all; }
+    #qr-drawer .qr-ch { font-size: 0.8rem; color: #e94560; font-weight: bold; margin-bottom: 4px; }
+    #qr-drawer .qr-url { font-size: 0.68rem; color: #888; margin-bottom: 14px; word-break: break-all; }
     #qr-canvas-wrap { background: white; padding: 12px; border-radius: 8px; display: inline-block; }
     #qr-canvas-wrap canvas, #qr-canvas-wrap img { display: block; }
     #qr-drawer .qr-hint { font-size: 0.75rem; color: #888; margin-top: 12px; }
@@ -171,6 +174,14 @@
 </div>
 
 <h1>🎨 紅白對抗賽 — 老師控制台</h1>
+
+<!-- 頻道切換 -->
+<div id="channel-bar">
+  <span class="ch-label">班級頻道：</span>
+  <button class="ch-btn active" id="ch-btn-C班" onclick="switchChannel('C班')">C班</button>
+  <button class="ch-btn" id="ch-btn-D班" onclick="switchChannel('D班')">D班</button>
+</div>
+
 <div class="container">
 
   <!-- 上傳作品 -->
@@ -217,7 +228,7 @@
       <button class="btn btn-primary" id="btn-start">🎲 開始新回合</button>
       <button class="btn btn-success" id="btn-end" disabled>✅ 結算本回合</button>
       <button class="btn btn-next" id="btn-end-start" disabled>⚡ 結算並開始新回合</button>
-      <button class="btn btn-danger btn-sm" id="btn-reset" style="margin-left:auto">🔄 重設全部資料</button>
+      <button class="btn btn-danger btn-sm" id="btn-reset" style="margin-left:auto">🔄 重設此班資料</button>
     </div>
   </div>
 
@@ -244,7 +255,8 @@
 <div id="qr-tab" onclick="toggleQR()">📱 學生 QR</div>
 <div id="qr-drawer">
   <h3>📱 學生投票頁</h3>
-  <div class="qr-url">https://oskens1.github.io/new_pk_draw/</div>
+  <div class="qr-ch" id="qr-ch-label">C班</div>
+  <div class="qr-url" id="qr-url-label"></div>
   <div id="qr-canvas-wrap"></div>
   <div class="qr-hint">掃描後即可進入投票頁面</div>
 </div>
@@ -275,7 +287,6 @@ async function tryLogin() {
 document.getElementById('login-btn').addEventListener('click', tryLogin);
 document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
 
-// 若本 session 已驗證，直接略過登入畫面
 if (sessionStorage.getItem('admin_auth') === '1') {
   document.getElementById('login-overlay').style.display = 'none';
 }
@@ -285,6 +296,22 @@ if (sessionStorage.getItem('admin_auth') === '1') {
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── 頻道設定 ──
+const CHANNELS = ['C班', 'D班'];
+const STUDENT_BASE_URL = 'https://oskens1.github.io/new_pk_draw/';
+let currentChannel = 'C班';
+
+function switchChannel(ch) {
+  currentChannel = ch;
+  CHANNELS.forEach(c => {
+    document.getElementById('ch-btn-' + c)?.classList.toggle('active', c === ch);
+  });
+  updateQRCode();
+  fetchState();
+  loadWorks();
+  showToast(`已切換到 ${ch}`);
+}
 
 // ── 狀態 ──
 let currentState = null;
@@ -303,12 +330,10 @@ function filenameWithoutExt(name) {
   return name.replace(/\.pdf$/i, '');
 }
 
-// 產生 Supabase Storage 用的安全 key（只保留 ASCII 英數字底線橫線，去掉中文）
 function toSafeKey(name) {
   return name.replace(/[^a-zA-Z0-9_\-\.]/g, '').replace(/_+$/, '') || name.replace(/[^0-9]/g, '') || Date.now().toString();
 }
 
-// ELO 計算
 function calcElo(eloA, eloB, winner) {
   const K = 32;
   const expA = 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
@@ -339,7 +364,7 @@ fileInput.addEventListener('change', () => addFiles([...fileInput.files]));
 
 function addFiles(files) {
   pendingFiles = files;
-  uploadCount.textContent = `已選 ${files.length} 個檔案`;
+  uploadCount.textContent = `已選 ${files.length} 個檔案（上傳至：${currentChannel}）`;
   btnUpload.disabled = files.length === 0;
   const list = document.getElementById('progress-list');
   list.innerHTML = '';
@@ -368,7 +393,6 @@ async function uploadOnePdf(file) {
 
   try {
     setSt('轉圖...'); setBar(20);
-    // PDF → canvas → PNG blob
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const page = await pdf.getPage(1);
@@ -380,29 +404,29 @@ async function uploadOnePdf(file) {
     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.88));
     setBar(50);
 
-    // 上傳到 Supabase Storage（key 只能用 ASCII，中文檔名需轉換）
     const displayName = filenameWithoutExt(file.name);
     const safeKey = toSafeKey(displayName);
-    const imgName = safeKey + '.jpg';
-    const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(imgName, blob, {
+    // 以頻道為子資料夾，避免不同班同學號衝突
+    const imgPath = currentChannel + '/' + safeKey + '.jpg';
+    const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(imgPath, blob, {
       contentType: 'image/jpeg', upsert: true
     });
     if (upErr) throw upErr;
     setBar(75);
 
-    // 取得 public URL
-    const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(imgName);
+    const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(imgPath);
     const imageUrl = urlData.publicUrl;
 
-    // 寫入 works 表（id 用 safeKey，filename 保留原始中文顯示名）
-    const workId = safeKey;
+    // workId 加上頻道前綴，確保不同班的作品 id 不衝突
+    const workId = currentChannel + '_' + safeKey;
     const { error: dbErr } = await sb.from('works').upsert({
       id: workId,
       image_url: imageUrl,
       filename: filenameWithoutExt(file.name),
       elo: 1500,
       match_count: 0,
-      win_count: 0
+      win_count: 0,
+      channel: currentChannel
     }, { onConflict: 'id', ignoreDuplicates: false });
     if (dbErr) throw dbErr;
     setBar(100); setSt('完成', 'status-ok');
@@ -416,23 +440,25 @@ async function uploadOnePdf(file) {
 document.getElementById('btn-start').addEventListener('click', startRound);
 document.getElementById('btn-end').addEventListener('click', endRound);
 document.getElementById('btn-end-start').addEventListener('click', endThenStart);
-document.getElementById('btn-reset').addEventListener('click', resetAll);
+document.getElementById('btn-reset').addEventListener('click', resetChannel);
 
 async function startRound() {
-  // 配對策略：以場數最少的作品為錨點，找 ELO 最接近的對手
-  // 目的：兼顧「每件作品都有機會參賽」與「強強弱弱相遇，排名快速收斂」
-  const { data: works, error } = await sb.from('works').select('*').order('match_count', { ascending: true });
+  // 只取當前頻道的作品，配對邏輯不變
+  const { data: works, error } = await sb.from('works').select('*')
+    .eq('channel', currentChannel)
+    .order('match_count', { ascending: true });
   if (error || !works || works.length < 2) { showToast('作品不足（需至少 2 件）', 'err'); return; }
 
-  const a = works[0]; // 場數最少的作品當錨點
+  const a = works[0];
   const others = works.slice(1).sort((x, y) => Math.abs(x.elo - a.elo) - Math.abs(y.elo - a.elo));
-  const b = others[0]; // ELO 最接近錨點的作品
+  const b = others[0];
 
   const matchId = 'match_' + Date.now();
   const roundNum = (currentState?.round_number || 0) + 1;
 
+  // system_state 用頻道名稱當 id（C班 / D班 各自獨立）
   const { error: err2 } = await sb.from('system_state').upsert({
-    id: 'current',
+    id: currentChannel,
     status: 'voting',
     match_id: matchId,
     match_a: { id: a.id, image_url: a.image_url, filename: a.filename, elo: a.elo, match_count: a.match_count, win_count: a.win_count },
@@ -441,14 +467,13 @@ async function startRound() {
     updated_at: new Date().toISOString()
   });
   if (err2) { showToast('開始回合失敗：' + err2.message, 'err'); return; }
-  showToast(`第 ${roundNum} 回合開始！`);
+  showToast(`${currentChannel} 第 ${roundNum} 回合開始！`);
   await fetchState();
 }
 
 async function endRound() {
   if (!currentState || currentState.status !== 'voting') return;
 
-  // 計算票數
   const { data: votes } = await sb.from('votes').select('choice').eq('match_id', currentState.match_id);
   const countA = votes?.filter(v => v.choice === 'A').length || 0;
   const countB = votes?.filter(v => v.choice === 'B').length || 0;
@@ -458,7 +483,6 @@ async function endRound() {
   const mb = currentState.match_b;
   const { newA, newB } = calcElo(ma.elo, mb.elo, winner);
 
-  // 更新兩件作品的 ELO（使用回合開始時的快照計算，避免競爭）
   await sb.from('works').update({
     elo: newA,
     match_count: (ma.match_count || 0) + 1,
@@ -471,14 +495,13 @@ async function endRound() {
     win_count: (mb.win_count || 0) + (winner === 'B' ? 1 : 0)
   }).eq('id', mb.id);
 
-  // 重設系統狀態
   await sb.from('system_state').update({
     status: 'waiting',
     match_id: null,
     match_a: null,
     match_b: null,
     updated_at: new Date().toISOString()
-  }).eq('id', 'current');
+  }).eq('id', currentChannel);
 
   showToast(`回合結算！勝方：${winner === 'A' ? ma.filename : mb.filename}（A:${countA} vs B:${countB}）`);
   await fetchState();
@@ -490,36 +513,41 @@ async function endThenStart() {
   await startRound();
 }
 
-async function resetAll() {
-  if (!confirm('確定要清除所有作品與投票資料嗎？這個動作無法還原！')) return;
+async function resetChannel() {
+  if (!confirm(`確定要清除【${currentChannel}】所有作品與投票資料嗎？這個動作無法還原！`)) return;
 
-  // 刪除 Storage 裡的圖片
-  const { data: files } = await sb.storage.from(STORAGE_BUCKET).list();
+  // 只刪此頻道在 Storage 的圖片（子資料夾）
+  const { data: files } = await sb.storage.from(STORAGE_BUCKET).list(currentChannel);
   if (files && files.length > 0) {
-    const paths = files.map(f => f.name);
+    const paths = files.map(f => `${currentChannel}/${f.name}`);
     await sb.storage.from(STORAGE_BUCKET).remove(paths);
   }
-  await sb.from('works').delete().neq('id', '___never___');
-  await sb.from('votes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await sb.from('system_state').update({
+
+  // 只刪此頻道的作品
+  await sb.from('works').delete().eq('channel', currentChannel);
+
+  // 只刪此頻道的投票
+  await sb.from('votes').delete().eq('channel', currentChannel);
+
+  // 重設此頻道的對戰狀態
+  await sb.from('system_state').upsert({
+    id: currentChannel,
     status: 'waiting', match_id: null, match_a: null, match_b: null,
     round_number: 0, updated_at: new Date().toISOString()
-  }).eq('id', 'current');
+  });
 
-  showToast('已重設所有資料');
+  showToast(`${currentChannel} 資料已重設`);
   await fetchState();
   loadWorks();
 }
 
-// ── 輪詢狀態 ──
+// ── 輪詢狀態（以頻道 id 查詢）──
 async function fetchState() {
-  const { data, error } = await sb.from('system_state').select('*').eq('id', 'current').single();
-  if (error) return;
+  const { data, error } = await sb.from('system_state').select('*').eq('id', currentChannel).single();
+  if (error) { currentState = null; renderState(); return; }
   currentState = data;
   renderState();
-  if (data.status === 'voting') {
-    updateVoteCounts();
-  }
+  if (data.status === 'voting') updateVoteCounts();
 }
 
 async function updateVoteCounts() {
@@ -539,15 +567,18 @@ function renderState() {
   const btnEndStart = document.getElementById('btn-end-start');
   const roundLabel = document.getElementById('round-num-label');
 
-  if (!currentState) return;
+  if (!currentState) {
+    badge.textContent = '等待中'; badge.className = 'badge-waiting';
+    matchArea.style.display = 'none';
+    btnStart.disabled = false; btnEnd.disabled = true; btnEndStart.disabled = true;
+    roundLabel.textContent = '';
+    return;
+  }
 
   if (currentState.status === 'voting') {
-    badge.textContent = '投票中';
-    badge.className = 'badge-voting';
+    badge.textContent = '投票中'; badge.className = 'badge-voting';
     matchArea.style.display = 'block';
-    btnStart.disabled = true;
-    btnEnd.disabled = false;
-    btnEndStart.disabled = false;
+    btnStart.disabled = true; btnEnd.disabled = false; btnEndStart.disabled = false;
     roundLabel.textContent = `第 ${currentState.round_number} 回合`;
 
     const ma = currentState.match_a || {};
@@ -557,24 +588,22 @@ function renderState() {
     document.getElementById('name-a').textContent = ma.filename || '—';
     document.getElementById('name-b').textContent = mb.filename || '—';
   } else {
-    badge.textContent = '等待中';
-    badge.className = 'badge-waiting';
+    badge.textContent = '等待中'; badge.className = 'badge-waiting';
     matchArea.style.display = 'none';
-    btnStart.disabled = false;
-    btnEnd.disabled = true;
-    btnEndStart.disabled = true;
+    btnStart.disabled = false; btnEnd.disabled = true; btnEndStart.disabled = true;
     roundLabel.textContent = currentState.round_number > 0 ? `已完成 ${currentState.round_number} 回合` : '';
     document.getElementById('votes-a').textContent = '0';
     document.getElementById('votes-b').textContent = '0';
   }
 }
 
-// ── 作品清單 & 排行榜 ──
+// ── 作品清單 & 排行榜（只顯示當前頻道）──
 async function loadWorks() {
-  const { data: works } = await sb.from('works').select('*').order('elo', { ascending: false });
+  const { data: works } = await sb.from('works').select('*')
+    .eq('channel', currentChannel)
+    .order('elo', { ascending: false });
   if (!works) return;
 
-  // 縮圖格
   const grid = document.getElementById('works-grid');
   grid.innerHTML = '';
   works.forEach(w => {
@@ -584,7 +613,6 @@ async function loadWorks() {
     grid.appendChild(div);
   });
 
-  // 排行榜
   const tbody = document.getElementById('rank-tbody');
   tbody.innerHTML = '';
   works.forEach((w, i) => {
@@ -597,24 +625,26 @@ async function loadWorks() {
   });
 }
 
-// ── QR Code 側邊抽屜 ──
-(function initQR() {
+// ── QR Code（隨頻道動態更新）──
+function updateQRCode() {
+  const url = STUDENT_BASE_URL + '?ch=' + encodeURIComponent(currentChannel);
+  document.getElementById('qr-ch-label').textContent = currentChannel;
+  document.getElementById('qr-url-label').textContent = url;
+
   const wrap = document.getElementById('qr-canvas-wrap');
+  wrap.innerHTML = '';
   new QRCode(wrap, {
-    text: 'https://oskens1.github.io/new_pk_draw/',
-    width: 200,
-    height: 200,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
+    text: url,
+    width: 200, height: 200,
+    colorDark: '#000000', colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.H
   });
-})();
+}
 
 function toggleQR() {
   document.getElementById('qr-drawer').classList.toggle('open');
 }
 
-// 點抽屜以外的地方自動關閉
 document.addEventListener('click', function(e) {
   const drawer = document.getElementById('qr-drawer');
   const tab = document.getElementById('qr-tab');
@@ -625,9 +655,9 @@ document.addEventListener('click', function(e) {
 
 // ── 啟動 ──
 (async () => {
+  updateQRCode();
   await fetchState();
   await loadWorks();
-  // 輪詢
   setInterval(async () => {
     await fetchState();
     if (currentState?.status === 'voting') updateVoteCounts();

@@ -9,20 +9,23 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-      background: #1a1a2e;
-      color: #eee;
+      background: #1a1a2e; color: #eee;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       padding: 16px;
     }
 
-    /* ── 待機畫面 ── */
-    #screen-waiting {
-      text-align: center;
+    /* 頻道標籤 */
+    #ch-badge {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      background: #0f3460; color: #aaa;
+      font-size: 0.75rem; padding: 4px 14px; border-radius: 20px;
+      letter-spacing: 1px; z-index: 10;
     }
+
+    /* ── 待機畫面 ── */
+    #screen-waiting { text-align: center; }
     #screen-waiting .logo { font-size: 4rem; margin-bottom: 16px; }
     #screen-waiting h1 { font-size: 1.6rem; color: #e94560; margin-bottom: 8px; }
     #screen-waiting p { color: #888; font-size: 0.95rem; }
@@ -49,6 +52,7 @@
     #lightbox img { max-width: 95vw; max-height: 88vh; object-fit: contain; border-radius: 8px; }
     #lightbox-close { position: absolute; top: 16px; right: 20px; font-size: 2rem; color: #fff; cursor: pointer; line-height: 1; }
     #lightbox-tip { color: #888; font-size: 0.8rem; margin-top: 10px; }
+
     .work-label { font-size: 1rem; font-weight: bold; color: #fff; text-align: center; }
     .vote-btn {
       width: 100%; padding: 14px 0; border: none; border-radius: 12px;
@@ -64,8 +68,7 @@
     /* 已投票狀態 */
     .voted-overlay {
       width: 100%; text-align: center; padding: 20px;
-      background: rgba(255,255,255,0.05); border-radius: 12px;
-      margin-top: 8px;
+      background: rgba(255,255,255,0.05); border-radius: 12px; margin-top: 8px;
     }
     .voted-overlay .check { font-size: 2.5rem; }
     .voted-overlay p { color: #aaa; font-size: 0.9rem; margin-top: 4px; }
@@ -78,6 +81,9 @@
   </style>
 </head>
 <body>
+
+<!-- 頻道標籤（右上角小標示） -->
+<div id="ch-badge">載入中...</div>
 
 <!-- 待機 -->
 <div id="screen-waiting">
@@ -137,7 +143,12 @@ function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
 }
 
-// ── Supabase 設定（內嵌，不依賴 config.js）──
+// ── 頻道（從 URL ?ch= 讀取，預設 C班）──
+const urlParams = new URLSearchParams(location.search);
+const currentChannel = urlParams.get('ch') || 'C班';
+document.getElementById('ch-badge').textContent = currentChannel;
+
+// ── Supabase 設定 ──
 const SUPABASE_URL = 'https://cnizzgyievmsqdglftrh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_8_fQGxMNZfoypvHQQGsL6w_cqhvvNXz';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -146,7 +157,6 @@ let currentMatchId = null;
 let hasVoted = false;
 let lastStatus = null;
 
-// 讀取本地已投票記錄
 function getVotedMatches() {
   try { return JSON.parse(localStorage.getItem('pk_voted') || '{}'); } catch { return {}; }
 }
@@ -164,7 +174,6 @@ async function vote(choice) {
   document.getElementById('btn-a').disabled = true;
   document.getElementById('btn-b').disabled = true;
 
-  // 產生 voter token（簡單防重複：本次頁面 session）
   const voterToken = localStorage.getItem('pk_token') || (() => {
     const t = Math.random().toString(36).slice(2) + Date.now().toString(36);
     localStorage.setItem('pk_token', t);
@@ -174,7 +183,8 @@ async function vote(choice) {
   const { error } = await sb.from('votes').insert({
     match_id: currentMatchId,
     choice: choice,
-    voter_token: voterToken
+    voter_token: voterToken,
+    channel: currentChannel
   });
 
   if (error) {
@@ -196,19 +206,18 @@ function showScreen(name) {
 }
 
 async function poll() {
-  const { data, error } = await sb.from('system_state').select('*').eq('id', 'current').single();
+  // 以頻道名稱查詢對應的 system_state
+  const { data, error } = await sb.from('system_state').select('*').eq('id', currentChannel).single();
   if (error || !data) return;
 
   const newMatchId = data.match_id;
   const status = data.status;
 
   if (status === 'voting') {
-    // 切換到新回合？重置投票狀態
     if (newMatchId !== currentMatchId) {
       currentMatchId = newMatchId;
       hasVoted = alreadyVoted(newMatchId);
 
-      // 填入作品資訊
       const ma = data.match_a || {};
       const mb = data.match_b || {};
       document.getElementById('img-a').src = ma.image_url || '';
@@ -223,9 +232,7 @@ async function poll() {
     }
     showScreen('voting');
   } else {
-    // waiting 或其他
     currentMatchId = null;
-    // 如果上一次是 voting → 短暫顯示「結束」畫面
     if (lastStatus === 'voting') {
       showScreen('result');
       setTimeout(() => showScreen('waiting'), 2500);
@@ -237,7 +244,6 @@ async function poll() {
   lastStatus = status;
 }
 
-// 啟動輪詢
 poll();
 setInterval(poll, 3000);
 </script>
