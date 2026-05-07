@@ -10,57 +10,24 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Microsoft JhengHei', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
-
-    /* ── 登入保護層 ── */
-    #login-overlay {
-      position: fixed; inset: 0; z-index: 99999;
-      background: #1a1a2e;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #login-box {
-      background: #16213e; border: 1px solid #0f3460;
-      border-radius: 16px; padding: 40px 36px; text-align: center; width: 320px;
-    }
+    #login-overlay { position: fixed; inset: 0; z-index: 99999; background: #1a1a2e; display: flex; align-items: center; justify-content: center; }
+    #login-box { background: #16213e; border: 1px solid #0f3460; border-radius: 16px; padding: 40px 36px; text-align: center; width: 320px; }
     #login-box h2 { color: #e94560; font-size: 1.4rem; margin-bottom: 8px; }
-    #login-box p  { color: #888; font-size: 0.85rem; margin-bottom: 24px; }
-    #login-box input {
-      width: 100%; padding: 12px 14px; border-radius: 8px;
-      border: 1px solid #0f3460; background: #1a1a2e; color: #eee;
-      font-size: 1rem; font-family: inherit; margin-bottom: 12px;
-    }
+    #login-box p { color: #888; font-size: 0.85rem; margin-bottom: 24px; }
+    #login-box input { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid #0f3460; background: #1a1a2e; color: #eee; font-size: 1rem; font-family: inherit; margin-bottom: 12px; }
     #login-box input:focus { outline: none; border-color: #e94560; }
-    #login-btn {
-      width: 100%; padding: 12px; border-radius: 8px; border: none;
-      background: #e94560; color: white; font-size: 1rem;
-      font-family: inherit; font-weight: bold; cursor: pointer;
-    }
+    #login-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #e94560; color: white; font-size: 1rem; font-family: inherit; font-weight: bold; cursor: pointer; }
     #login-btn:hover { opacity: 0.85; }
     #login-err { color: #f44336; font-size: 0.85rem; margin-top: 10px; min-height: 20px; }
-
     h1 { text-align: center; padding: 20px 20px 8px; font-size: 1.8rem; color: #e94560; letter-spacing: 2px; }
-
-    /* ── 頻道切換 ── */
-    #channel-bar {
-      display: flex; justify-content: center; align-items: center;
-      gap: 12px; padding: 8px 0 16px;
-    }
+    #channel-bar { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 8px 0 16px; }
     .ch-label { color: #888; font-size: 0.95rem; }
-    .ch-btn {
-      padding: 8px 28px; border: 2px solid #0f3460; border-radius: 24px;
-      background: transparent; color: #aaa;
-      font-size: 1rem; font-family: inherit; font-weight: bold;
-      cursor: pointer; transition: all 0.2s;
-    }
+    .ch-btn { padding: 8px 28px; border: 2px solid #0f3460; border-radius: 24px; background: transparent; color: #aaa; font-size: 1rem; font-family: inherit; font-weight: bold; cursor: pointer; transition: all 0.2s; }
     .ch-btn.active { background: #e94560; border-color: #e94560; color: white; }
     .ch-btn:hover:not(.active) { border-color: #e94560; color: #e94560; }
-
     .container { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
-
-    /* 分區 */
     .section { background: #16213e; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #0f3460; }
     .section h2 { font-size: 1.1rem; color: #e94560; margin-bottom: 16px; border-bottom: 1px solid #0f3460; padding-bottom: 8px; }
-
-    /* 上傳區 */
     .upload-area { border: 2px dashed #0f3460; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
     .upload-area:hover, .upload-area.dragover { border-color: #e94560; }
     .upload-area input { display: none; }
@@ -72,19 +39,15 @@
     .progress-item .status { width: 60px; text-align: right; font-size: 0.75rem; }
     .status-ok { color: #4caf50; }
     .status-err { color: #f44336; }
-
-    /* 按鈕 */
     .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-family: inherit; font-weight: bold; transition: opacity 0.2s; }
     .btn:hover { opacity: 0.85; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-primary { background: #e94560; color: white; }
     .btn-success { background: #4caf50; color: white; }
-    .btn-danger  { background: #f44336; color: white; }
-    .btn-gray    { background: #444; color: white; }
-    .btn-next    { background: #1976d2; color: white; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-gray { background: #444; color: white; }
+    .btn-next { background: #1976d2; color: white; }
     .btn-sm { padding: 6px 14px; font-size: 0.85rem; }
-
-    /* 回合控制 */
     .match-display { display: flex; gap: 16px; align-items: stretch; margin-bottom: 16px; }
     .match-card { flex: 1; background: #0f3460; border-radius: 10px; padding: 16px; text-align: center; }
     .match-card img { width: 100%; max-height: 250px; object-fit: contain; border-radius: 6px; background: #111; }
@@ -95,10 +58,8 @@
     .round-info { font-size: 0.9rem; color: #888; margin-bottom: 12px; }
     #status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
     .badge-waiting { background: #444; color: #aaa; }
-    .badge-voting  { background: #e94560; color: white; animation: pulse 1.5s infinite; }
+    .badge-voting { background: #e94560; color: white; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
-
-    /* 作品清單 */
     .works-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px; }
     .work-thumb { background: #0f3460; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
     .work-thumb:hover { border-color: #e94560; }
@@ -107,8 +68,6 @@
     .work-thumb .info .name { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .work-thumb .info .elo { color: #e94560; font-size: 0.75rem; }
     .work-thumb.selected { border-color: #4caf50; }
-
-    /* 排行榜 */
     .rank-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .rank-table th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #0f3460; color: #888; font-weight: normal; }
     .rank-table td { padding: 8px 12px; border-bottom: 1px solid #0f3460; }
@@ -117,40 +76,16 @@
     .rank-1 { color: #ffd700; }
     .rank-2 { color: #c0c0c0; }
     .rank-3 { color: #cd7f32; }
-
-    /* 訊息 */
     .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
     .toast.show { opacity: 1; }
-    .toast-ok  { background: #4caf50; color: white; }
+    .toast-ok { background: #4caf50; color: white; }
     .toast-err { background: #f44336; color: white; }
-
     .flex-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .upload-btn-wrap { margin-top: 12px; }
     #upload-count { font-size: 0.85rem; color: #888; }
-
-    /* ── QR Code 側邊抽屜 ── */
-    #qr-tab {
-      position: fixed; right: 0; top: 50%;
-      transform: translateY(-50%);
-      background: #e94560; color: white;
-      writing-mode: vertical-rl; text-orientation: mixed;
-      padding: 16px 10px; border-radius: 8px 0 0 8px;
-      cursor: pointer; font-size: 0.9rem; font-weight: bold;
-      letter-spacing: 2px; z-index: 1000; user-select: none;
-      transition: background 0.2s;
-      box-shadow: -2px 0 8px rgba(0,0,0,0.4);
-    }
+    #qr-tab { position: fixed; right: 0; top: 50%; transform: translateY(-50%); background: #e94560; color: white; writing-mode: vertical-rl; text-orientation: mixed; padding: 16px 10px; border-radius: 8px 0 0 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; letter-spacing: 2px; z-index: 1000; user-select: none; transition: background 0.2s; box-shadow: -2px 0 8px rgba(0,0,0,0.4); }
     #qr-tab:hover { background: #c62a47; }
-    #qr-drawer {
-      position: fixed; right: -300px; top: 50%;
-      transform: translateY(-50%);
-      width: 280px; background: #16213e;
-      border: 1px solid #0f3460; border-radius: 12px 0 0 12px;
-      padding: 20px; z-index: 999;
-      transition: right 0.3s ease;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.5);
-      text-align: center;
-    }
+    #qr-drawer { position: fixed; right: -300px; top: 50%; transform: translateY(-50%); width: 280px; background: #16213e; border: 1px solid #0f3460; border-radius: 12px 0 0 12px; padding: 20px; z-index: 999; transition: right 0.3s ease; box-shadow: -4px 0 20px rgba(0,0,0,0.5); text-align: center; }
     #qr-drawer.open { right: 0; }
     #qr-drawer h3 { color: #e94560; font-size: 1rem; margin-bottom: 4px; }
     #qr-drawer .qr-ch { font-size: 0.8rem; color: #e94560; font-weight: bold; margin-bottom: 4px; }
@@ -161,509 +96,94 @@
   </style>
 </head>
 <body>
-
-<!-- 登入保護層 -->
-<div id="login-overlay">
-  <div id="login-box">
-    <h2>🔒 老師控制台</h2>
-    <p>請輸入密碼以進入</p>
-    <input type="password" id="pw-input" placeholder="密碼" autocomplete="current-password">
-    <button id="login-btn">進入</button>
-    <div id="login-err"></div>
-  </div>
-</div>
-
+<div id="login-overlay"><div id="login-box"><h2>🔒 老師控制台</h2><p>請輸入密碼以進入</p><input type="password" id="pw-input" placeholder="密碼" autocomplete="current-password"><button id="login-btn">進入</button><div id="login-err"></div></div></div>
 <h1>🎨 紅白對抗賽 — 老師控制台</h1>
-
-<!-- 頻道切換 -->
-<div id="channel-bar">
-  <span class="ch-label">班級頻道：</span>
-  <button class="ch-btn active" id="ch-btn-C班" onclick="switchChannel('C班')">C班</button>
-  <button class="ch-btn" id="ch-btn-D班" onclick="switchChannel('D班')">D班</button>
-</div>
-
+<div style="text-align:center;font-size:0.75rem;color:#555;margin-top:-8px;margin-bottom:4px;">v1.0.1</div>
+<div id="channel-bar"><span class="ch-label">班級頻道：</span><button class="ch-btn active" id="ch-btn-C班" onclick="switchChannel('C班')">C班</button><button class="ch-btn" id="ch-btn-D班" onclick="switchChannel('D班')">D班</button></div>
 <div class="container">
-
-  <!-- 上傳作品 -->
-  <div class="section">
-    <h2>📤 上傳作品（單頁 PDF）</h2>
-    <div class="upload-area" id="upload-area">
-      <input type="file" id="file-input" accept=".pdf" multiple>
-      <div style="font-size:2.5rem">📁</div>
-      <div style="font-size:1rem; margin-top:8px">點擊或拖曳 PDF 到此區域</div>
-      <p>檔案名稱即顯示名稱（如：301_15.pdf → 顯示「301_15」）</p>
-    </div>
-    <div class="upload-btn-wrap flex-row">
-      <button class="btn btn-primary" id="btn-upload" disabled>🚀 開始上傳</button>
-      <span id="upload-count"></span>
-    </div>
-    <div class="progress-list" id="progress-list"></div>
-  </div>
-
-  <!-- 回合控制 -->
-  <div class="section">
-    <h2>⚔️ 回合控制</h2>
-    <div class="round-info flex-row">
-      <span>狀態：<span id="status-badge" class="badge-waiting">等待中</span></span>
-      <span id="round-num-label"></span>
-    </div>
-    <div id="match-area" style="display:none">
-      <div class="match-display">
-        <div class="match-card" id="card-a">
-          <img id="img-a" src="" alt="">
-          <div class="filename" id="name-a">—</div>
-          <div class="votes" id="votes-a">0</div>
-          <div style="font-size:0.75rem;color:#888">票</div>
-        </div>
-        <div class="match-vs">VS</div>
-        <div class="match-card" id="card-b">
-          <img id="img-b" src="" alt="">
-          <div class="filename" id="name-b">—</div>
-          <div class="votes" id="votes-b">0</div>
-          <div style="font-size:0.75rem;color:#888">票</div>
-        </div>
-      </div>
-    </div>
-    <div class="round-actions">
-      <button class="btn btn-primary" id="btn-start">🎲 開始新回合</button>
-      <button class="btn btn-success" id="btn-end" disabled>✅ 結算本回合</button>
-      <button class="btn btn-next" id="btn-end-start" disabled>⚡ 結算並開始新回合</button>
-      <button class="btn btn-danger btn-sm" id="btn-reset" style="margin-left:auto">🔄 重設此班資料</button>
-    </div>
-  </div>
-
-  <!-- 作品清單 -->
-  <div class="section">
-    <h2>🖼️ 所有作品</h2>
-    <div class="works-grid" id="works-grid"></div>
-  </div>
-
-  <!-- 排行榜 -->
-  <div class="section">
-    <h2>🏆 ELO 排行榜</h2>
-    <table class="rank-table">
-      <thead><tr><th>#</th><th>作品</th><th>ELO</th><th>場數</th><th>勝場</th><th>勝率</th></tr></thead>
-      <tbody id="rank-tbody"></tbody>
-    </table>
-  </div>
-
+  <div class="section"><h2>📤 上傳作品（單頁 PDF）</h2><div class="upload-area" id="upload-area"><input type="file" id="file-input" accept=".pdf" multiple><div style="font-size:2.5rem">📁</div><div style="font-size:1rem;margin-top:8px">點擊或拖曳 PDF 到此區域</div><p>檔案名稱即顯示名稱（如：301_15.pdf → 顯示「301_15」）</p></div><div class="upload-btn-wrap flex-row"><button class="btn btn-primary" id="btn-upload" disabled>🚀 開始上傳</button><span id="upload-count"></span></div><div class="progress-list" id="progress-list"></div></div>
+  <div class="section"><h2>⚔️ 回合控制</h2><div class="round-info flex-row"><span>狀態：<span id="status-badge" class="badge-waiting">等待中</span></span><span id="round-num-label"></span></div><div id="match-area" style="display:none"><div class="match-display"><div class="match-card" id="card-a"><img id="img-a" src="" alt=""><div class="filename" id="name-a">—</div><div class="votes" id="votes-a">0</div><div style="font-size:0.75rem;color:#888">票</div></div><div class="match-vs">VS</div><div class="match-card" id="card-b"><img id="img-b" src="" alt=""><div class="filename" id="name-b">—</div><div class="votes" id="votes-b">0</div><div style="font-size:0.75rem;color:#888">票</div></div></div></div><div class="round-actions"><button class="btn btn-primary" id="btn-start">🎲 開始新回合</button><button class="btn btn-success" id="btn-end" disabled>✅ 結算本回合</button><button class="btn btn-next" id="btn-end-start" disabled>⚡ 結算並開始新回合</button><button class="btn btn-danger btn-sm" id="btn-reset" style="margin-left:auto">🔄 重設此班資料</button></div></div>
+  <div class="section"><h2>🖼️ 所有作品</h2><div class="works-grid" id="works-grid"></div></div>
+  <div class="section"><h2>🏆 ELO 排行榜</h2><table class="rank-table"><thead><tr><th>#</th><th>作品</th><th>ELO</th><th>場數</th><th>勝場</th><th>勝率</th></tr></thead><tbody id="rank-tbody"></tbody></table></div>
 </div>
-
 <div class="toast" id="toast"></div>
-
-<!-- QR Code 側邊抽屜 -->
 <div id="qr-tab" onclick="toggleQR()">📱 學生 QR</div>
-<div id="qr-drawer">
-  <h3>📱 學生投票頁</h3>
-  <div class="qr-ch" id="qr-ch-label">C班</div>
-  <div class="qr-url" id="qr-url-label"></div>
-  <div id="qr-canvas-wrap"></div>
-  <div class="qr-hint">掃描後即可進入投票頁面</div>
-</div>
-
+<div id="qr-drawer"><h3>📱 學生投票頁</h3><div class="qr-ch" id="qr-ch-label">C班</div><div class="qr-url" id="qr-url-label"></div><div id="qr-canvas-wrap"></div><div class="qr-hint">掃描後即可進入投票頁面</div></div>
 <script src="config.js"></script>
 <script>
-// ── 登入保護 ──
-const PW_HASH = '00264e1405a7bc5eea1b8c0d272a4d87fa1653e007aea7ec00015208c480a51c';
-
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-async function tryLogin() {
-  const pw = document.getElementById('pw-input').value;
-  const hash = await sha256(pw);
-  if (hash === PW_HASH) {
-    sessionStorage.setItem('admin_auth', '1');
-    document.getElementById('login-overlay').style.display = 'none';
-  } else {
-    document.getElementById('login-err').textContent = '密碼錯誤，請再試一次';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-input').focus();
-  }
-}
-
-document.getElementById('login-btn').addEventListener('click', tryLogin);
-document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
-
-if (sessionStorage.getItem('admin_auth') === '1') {
-  document.getElementById('login-overlay').style.display = 'none';
-}
+const PW_HASH='00264e1405a7bc5eea1b8c0d272a4d87fa1653e007aea7ec00015208c480a51c';
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function tryLogin(){const pw=document.getElementById('pw-input').value;const h=await sha256(pw);if(h===PW_HASH){sessionStorage.setItem('admin_auth','1');document.getElementById('login-overlay').style.display='none';}else{document.getElementById('login-err').textContent='密碼錯誤，請再試一次';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();}}
+document.getElementById('login-btn').addEventListener('click',tryLogin);
+document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+if(sessionStorage.getItem('admin_auth')==='1')document.getElementById('login-overlay').style.display='none';
 </script>
-
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ── 頻道設定 ──
-const CHANNELS = ['C班', 'D班'];
-const STUDENT_BASE_URL = 'https://oskens1.github.io/new_pk_draw/';
-let currentChannel = 'C班';
-
-function switchChannel(ch) {
-  currentChannel = ch;
-  CHANNELS.forEach(c => {
-    document.getElementById('ch-btn-' + c)?.classList.toggle('active', c === ch);
-  });
-  updateQRCode();
-  fetchState();
-  loadWorks();
-  showToast(`已切換到 ${ch}`);
-}
-
-// ── 狀態 ──
-let currentState = null;
-let pollInterval = null;
-let pendingFiles = [];
-
-// ── 工具 ──
-function showToast(msg, type = 'ok') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast toast-${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function filenameWithoutExt(name) {
-  return name.replace(/\.pdf$/i, '');
-}
-
-function toSafeKey(name) {
-  return name.replace(/[^a-zA-Z0-9_\-\.]/g, '').replace(/_+$/, '') || name.replace(/[^0-9]/g, '') || Date.now().toString();
-}
-
-function calcElo(eloA, eloB, winner) {
-  const K = 32;
-  const expA = 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
-  const expB = 1 - expA;
-  const sa = winner === 'A' ? 1 : 0;
-  const sb2 = 1 - sa;
-  return {
-    newA: Math.round(eloA + K * (sa - expA)),
-    newB: Math.round(eloB + K * (sb2 - expB))
-  };
-}
-
-// ── 上傳邏輯 ──
-const uploadArea = document.getElementById('upload-area');
-const fileInput  = document.getElementById('file-input');
-const btnUpload  = document.getElementById('btn-upload');
-const uploadCount = document.getElementById('upload-count');
-
-uploadArea.addEventListener('click', () => fileInput.click());
-uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-uploadArea.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadArea.classList.remove('dragover');
-  addFiles([...e.dataTransfer.files].filter(f => f.name.endsWith('.pdf')));
-});
-fileInput.addEventListener('change', () => addFiles([...fileInput.files]));
-
-function addFiles(files) {
-  pendingFiles = files;
-  uploadCount.textContent = `已選 ${files.length} 個檔案（上傳至：${currentChannel}）`;
-  btnUpload.disabled = files.length === 0;
-  const list = document.getElementById('progress-list');
-  list.innerHTML = '';
-  files.forEach(f => {
-    const div = document.createElement('div');
-    div.className = 'progress-item';
-    div.id = 'prog_' + f.name;
-    div.innerHTML = `<span style="flex:0 0 160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${filenameWithoutExt(f.name)}</span><div class="bar"><div class="bar-fill" id="bar_${f.name}"></div></div><span class="status" id="st_${f.name}">等待</span>`;
-    list.appendChild(div);
-  });
-}
-
-btnUpload.addEventListener('click', async () => {
-  btnUpload.disabled = true;
-  for (const file of pendingFiles) {
-    await uploadOnePdf(file);
-  }
-  btnUpload.disabled = false;
-  loadWorks();
-  showToast('上傳完成！');
-});
-
-async function uploadOnePdf(file) {
-  const setBar = (pct) => { const b = document.getElementById('bar_' + file.name); if(b) b.style.width = pct + '%'; };
-  const setSt  = (txt, cls) => { const s = document.getElementById('st_' + file.name); if(s){ s.textContent = txt; if(cls) s.className = 'status ' + cls; } };
-
-  try {
-    setSt('轉圖...'); setBar(20);
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 1.0 });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.88));
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const CHANNELS=['C班','D班'];
+const CHANNEL_FOLDERS={'C班':'class_C','D班':'class_D'};
+const STUDENT_BASE_URL='https://oskens1.github.io/new_pk_draw/';
+let currentChannel='C班';
+function switchChannel(ch){currentChannel=ch;CHANNELS.forEach(c=>{document.getElementById('ch-btn-'+c)?.classList.toggle('active',c===ch);});updateQRCode();fetchState();loadWorks();showToast('已切換到 '+ch);}
+let currentState=null,pendingFiles=[];
+function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast toast-'+type+' show';setTimeout(()=>t.classList.remove('show'),3000);}
+function filenameWithoutExt(n){return n.replace(/\.pdf$/i,'');}
+function toSafeKey(n){return n.replace(/[^a-zA-Z0-9_\-\.]/g,'').replace(/_+$/,'')||n.replace(/[^0-9]/g,'')||Date.now().toString();}
+function calcElo(a,b,w){const K=32,eA=1/(1+Math.pow(10,(b-a)/400)),eB=1-eA,sA=w==='A'?1:0;return{newA:Math.round(a+K*(sA-eA)),newB:Math.round(b+K*((1-sA)-eB))};}
+const uploadArea=document.getElementById('upload-area'),fileInput=document.getElementById('file-input'),btnUpload=document.getElementById('btn-upload'),uploadCount=document.getElementById('upload-count');
+uploadArea.addEventListener('click',()=>fileInput.click());
+uploadArea.addEventListener('dragover',e=>{e.preventDefault();uploadArea.classList.add('dragover');});
+uploadArea.addEventListener('dragleave',()=>uploadArea.classList.remove('dragover'));
+uploadArea.addEventListener('drop',e=>{e.preventDefault();uploadArea.classList.remove('dragover');addFiles([...e.dataTransfer.files].filter(f=>f.name.endsWith('.pdf')));});
+fileInput.addEventListener('change',()=>addFiles([...fileInput.files]));
+function addFiles(files){pendingFiles=files;uploadCount.textContent='已選 '+files.length+' 個檔案（上傳至：'+currentChannel+'）';btnUpload.disabled=files.length===0;const list=document.getElementById('progress-list');list.innerHTML='';files.forEach(f=>{const div=document.createElement('div');div.className='progress-item';div.id='prog_'+f.name;div.innerHTML='<span style="flex:0 0 160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+filenameWithoutExt(f.name)+'</span><div class="bar"><div class="bar-fill" id="bar_'+f.name+'"></div></div><span class="status" id="st_'+f.name+'">等待</span>';list.appendChild(div);});}
+btnUpload.addEventListener('click',async()=>{btnUpload.disabled=true;for(const f of pendingFiles)await uploadOnePdf(f);btnUpload.disabled=false;loadWorks();showToast('上傳完成！');});
+async function uploadOnePdf(file){
+  const setBar=p=>{const b=document.getElementById('bar_'+file.name);if(b)b.style.width=p+'%';};
+  const setSt=(t,c)=>{const s=document.getElementById('st_'+file.name);if(s){s.textContent=t;if(c)s.className='status '+c;}};
+  try{
+    setSt('轉圖...');setBar(20);
+    const ab=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+    const page=await pdf.getPage(1);
+    const vp=page.getViewport({scale:1.0});
+    const canvas=document.createElement('canvas');
+    canvas.width=vp.width;canvas.height=vp.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.88));
     setBar(50);
-
-    const displayName = filenameWithoutExt(file.name);
-    const safeKey = toSafeKey(displayName);
-    // 以頻道為子資料夾，避免不同班同學號衝突
-    const imgPath = currentChannel + '/' + safeKey + '.jpg';
-    const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(imgPath, blob, {
-      contentType: 'image/jpeg', upsert: true
-    });
-    if (upErr) throw upErr;
+    const displayName=filenameWithoutExt(file.name);
+    const safeKey=toSafeKey(displayName);
+    const safeFolder=CHANNEL_FOLDERS[currentChannel]||toSafeKey(currentChannel);
+    const imgPath=safeFolder+'/'+safeKey+'.jpg';
+    const{error:upErr}=await sb.storage.from(STORAGE_BUCKET).upload(imgPath,blob,{contentType:'image/jpeg',upsert:true});
+    if(upErr)throw upErr;
     setBar(75);
-
-    const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(imgPath);
-    const imageUrl = urlData.publicUrl;
-
-    // workId 加上頻道前綴，確保不同班的作品 id 不衝突
-    const workId = currentChannel + '_' + safeKey;
-    const { error: dbErr } = await sb.from('works').upsert({
-      id: workId,
-      image_url: imageUrl,
-      filename: filenameWithoutExt(file.name),
-      elo: 1500,
-      match_count: 0,
-      win_count: 0,
-      channel: currentChannel
-    }, { onConflict: 'id', ignoreDuplicates: false });
-    if (dbErr) throw dbErr;
-    setBar(100); setSt('完成', 'status-ok');
-  } catch(e) {
-    setSt('失敗', 'status-err');
-    console.error(file.name, e);
-  }
+    const{data:urlData}=sb.storage.from(STORAGE_BUCKET).getPublicUrl(imgPath);
+    const imageUrl=urlData.publicUrl;
+    const workId=currentChannel+'_'+safeKey;
+    const{error:dbErr}=await sb.from('works').upsert({id:workId,image_url:imageUrl,filename:filenameWithoutExt(file.name),elo:1500,match_count:0,win_count:0,channel:currentChannel},{onConflict:'id',ignoreDuplicates:false});
+    if(dbErr)throw dbErr;
+    setBar(100);setSt('完成','status-ok');
+  }catch(e){setSt('失敗','status-err');console.error(file.name,e);}
 }
-
-// ── 回合控制 ──
-document.getElementById('btn-start').addEventListener('click', startRound);
-document.getElementById('btn-end').addEventListener('click', endRound);
-document.getElementById('btn-end-start').addEventListener('click', endThenStart);
-document.getElementById('btn-reset').addEventListener('click', resetChannel);
-
-async function startRound() {
-  // 只取當前頻道的作品，配對邏輯不變
-  const { data: works, error } = await sb.from('works').select('*')
-    .eq('channel', currentChannel)
-    .order('match_count', { ascending: true });
-  if (error || !works || works.length < 2) { showToast('作品不足（需至少 2 件）', 'err'); return; }
-
-  const a = works[0];
-  const others = works.slice(1).sort((x, y) => Math.abs(x.elo - a.elo) - Math.abs(y.elo - a.elo));
-  const b = others[0];
-
-  const matchId = 'match_' + Date.now();
-  const roundNum = (currentState?.round_number || 0) + 1;
-
-  // system_state 用頻道名稱當 id（C班 / D班 各自獨立）
-  const { error: err2 } = await sb.from('system_state').upsert({
-    id: currentChannel,
-    status: 'voting',
-    match_id: matchId,
-    match_a: { id: a.id, image_url: a.image_url, filename: a.filename, elo: a.elo, match_count: a.match_count, win_count: a.win_count },
-    match_b: { id: b.id, image_url: b.image_url, filename: b.filename, elo: b.elo, match_count: b.match_count, win_count: b.win_count },
-    round_number: roundNum,
-    updated_at: new Date().toISOString()
-  });
-  if (err2) { showToast('開始回合失敗：' + err2.message, 'err'); return; }
-  showToast(`${currentChannel} 第 ${roundNum} 回合開始！`);
-  await fetchState();
-}
-
-async function endRound() {
-  if (!currentState || currentState.status !== 'voting') return;
-
-  const { data: votes } = await sb.from('votes').select('choice').eq('match_id', currentState.match_id);
-  const countA = votes?.filter(v => v.choice === 'A').length || 0;
-  const countB = votes?.filter(v => v.choice === 'B').length || 0;
-  const winner = countA >= countB ? 'A' : 'B';
-
-  const ma = currentState.match_a;
-  const mb = currentState.match_b;
-  const { newA, newB } = calcElo(ma.elo, mb.elo, winner);
-
-  await sb.from('works').update({
-    elo: newA,
-    match_count: (ma.match_count || 0) + 1,
-    win_count: (ma.win_count || 0) + (winner === 'A' ? 1 : 0)
-  }).eq('id', ma.id);
-
-  await sb.from('works').update({
-    elo: newB,
-    match_count: (mb.match_count || 0) + 1,
-    win_count: (mb.win_count || 0) + (winner === 'B' ? 1 : 0)
-  }).eq('id', mb.id);
-
-  await sb.from('system_state').update({
-    status: 'waiting',
-    match_id: null,
-    match_a: null,
-    match_b: null,
-    updated_at: new Date().toISOString()
-  }).eq('id', currentChannel);
-
-  showToast(`回合結算！勝方：${winner === 'A' ? ma.filename : mb.filename}（A:${countA} vs B:${countB}）`);
-  await fetchState();
-  loadWorks();
-}
-
-async function endThenStart() {
-  await endRound();
-  await startRound();
-}
-
-async function resetChannel() {
-  if (!confirm(`確定要清除【${currentChannel}】所有作品與投票資料嗎？這個動作無法還原！`)) return;
-
-  // 只刪此頻道在 Storage 的圖片（子資料夾）
-  const { data: files } = await sb.storage.from(STORAGE_BUCKET).list(currentChannel);
-  if (files && files.length > 0) {
-    const paths = files.map(f => `${currentChannel}/${f.name}`);
-    await sb.storage.from(STORAGE_BUCKET).remove(paths);
-  }
-
-  // 只刪此頻道的作品
-  await sb.from('works').delete().eq('channel', currentChannel);
-
-  // 只刪此頻道的投票
-  await sb.from('votes').delete().eq('channel', currentChannel);
-
-  // 重設此頻道的對戰狀態
-  await sb.from('system_state').upsert({
-    id: currentChannel,
-    status: 'waiting', match_id: null, match_a: null, match_b: null,
-    round_number: 0, updated_at: new Date().toISOString()
-  });
-
-  showToast(`${currentChannel} 資料已重設`);
-  await fetchState();
-  loadWorks();
-}
-
-// ── 輪詢狀態（以頻道 id 查詢）──
-async function fetchState() {
-  const { data, error } = await sb.from('system_state').select('*').eq('id', currentChannel).single();
-  if (error) { currentState = null; renderState(); return; }
-  currentState = data;
-  renderState();
-  if (data.status === 'voting') updateVoteCounts();
-}
-
-async function updateVoteCounts() {
-  if (!currentState || !currentState.match_id) return;
-  const { data: votes } = await sb.from('votes').select('choice').eq('match_id', currentState.match_id);
-  const countA = votes?.filter(v => v.choice === 'A').length || 0;
-  const countB = votes?.filter(v => v.choice === 'B').length || 0;
-  document.getElementById('votes-a').textContent = countA;
-  document.getElementById('votes-b').textContent = countB;
-}
-
-function renderState() {
-  const badge = document.getElementById('status-badge');
-  const matchArea = document.getElementById('match-area');
-  const btnStart    = document.getElementById('btn-start');
-  const btnEnd      = document.getElementById('btn-end');
-  const btnEndStart = document.getElementById('btn-end-start');
-  const roundLabel = document.getElementById('round-num-label');
-
-  if (!currentState) {
-    badge.textContent = '等待中'; badge.className = 'badge-waiting';
-    matchArea.style.display = 'none';
-    btnStart.disabled = false; btnEnd.disabled = true; btnEndStart.disabled = true;
-    roundLabel.textContent = '';
-    return;
-  }
-
-  if (currentState.status === 'voting') {
-    badge.textContent = '投票中'; badge.className = 'badge-voting';
-    matchArea.style.display = 'block';
-    btnStart.disabled = true; btnEnd.disabled = false; btnEndStart.disabled = false;
-    roundLabel.textContent = `第 ${currentState.round_number} 回合`;
-
-    const ma = currentState.match_a || {};
-    const mb = currentState.match_b || {};
-    document.getElementById('img-a').src = ma.image_url || '';
-    document.getElementById('img-b').src = mb.image_url || '';
-    document.getElementById('name-a').textContent = ma.filename || '—';
-    document.getElementById('name-b').textContent = mb.filename || '—';
-  } else {
-    badge.textContent = '等待中'; badge.className = 'badge-waiting';
-    matchArea.style.display = 'none';
-    btnStart.disabled = false; btnEnd.disabled = true; btnEndStart.disabled = true;
-    roundLabel.textContent = currentState.round_number > 0 ? `已完成 ${currentState.round_number} 回合` : '';
-    document.getElementById('votes-a').textContent = '0';
-    document.getElementById('votes-b').textContent = '0';
-  }
-}
-
-// ── 作品清單 & 排行榜（只顯示當前頻道）──
-async function loadWorks() {
-  const { data: works } = await sb.from('works').select('*')
-    .eq('channel', currentChannel)
-    .order('elo', { ascending: false });
-  if (!works) return;
-
-  const grid = document.getElementById('works-grid');
-  grid.innerHTML = '';
-  works.forEach(w => {
-    const div = document.createElement('div');
-    div.className = 'work-thumb';
-    div.innerHTML = `<img src="${w.image_url}" loading="lazy" alt="${w.filename}"><div class="info"><div class="name">${w.filename}</div><div class="elo">ELO: ${w.elo} | ${w.match_count}場</div></div>`;
-    grid.appendChild(div);
-  });
-
-  const tbody = document.getElementById('rank-tbody');
-  tbody.innerHTML = '';
-  works.forEach((w, i) => {
-    const rank = i + 1;
-    const rankClass = rank <= 3 ? `rank-${rank}` : '';
-    const winRate = w.match_count > 0 ? Math.round(w.win_count / w.match_count * 100) + '%' : '—';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="rank-num ${rankClass}">${rank}</td><td>${w.filename}</td><td>${w.elo}</td><td>${w.match_count}</td><td>${w.win_count}</td><td>${winRate}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// ── QR Code（隨頻道動態更新）──
-function updateQRCode() {
-  const url = STUDENT_BASE_URL + '?ch=' + encodeURIComponent(currentChannel);
-  document.getElementById('qr-ch-label').textContent = currentChannel;
-  document.getElementById('qr-url-label').textContent = url;
-
-  const wrap = document.getElementById('qr-canvas-wrap');
-  wrap.innerHTML = '';
-  new QRCode(wrap, {
-    text: url,
-    width: 200, height: 200,
-    colorDark: '#000000', colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
-  });
-}
-
-function toggleQR() {
-  document.getElementById('qr-drawer').classList.toggle('open');
-}
-
-document.addEventListener('click', function(e) {
-  const drawer = document.getElementById('qr-drawer');
-  const tab = document.getElementById('qr-tab');
-  if (drawer.classList.contains('open') && !drawer.contains(e.target) && !tab.contains(e.target)) {
-    drawer.classList.remove('open');
-  }
-});
-
-// ── 啟動 ──
-(async () => {
-  updateQRCode();
-  await fetchState();
-  await loadWorks();
-  setInterval(async () => {
-    await fetchState();
-    if (currentState?.status === 'voting') updateVoteCounts();
-  }, 3000);
-  setInterval(loadWorks, 10000);
-})();
+document.getElementById('btn-start').addEventListener('click',startRound);
+document.getElementById('btn-end').addEventListener('click',endRound);
+document.getElementById('btn-end-start').addEventListener('click',endThenStart);
+document.getElementById('btn-reset').addEventListener('click',resetChannel);
+async function startRound(){const{data:works,error}=await sb.from('works').select('*').eq('channel',currentChannel).order('match_count',{ascending:true});if(error||!works||works.length<2){showToast('作品不足（需至少 2 件）','err');return;}const a=works[0];const b=works.slice(1).sort((x,y)=>Math.abs(x.elo-a.elo)-Math.abs(y.elo-a.elo))[0];const matchId='match_'+Date.now();const roundNum=(currentState?.round_number||0)+1;const{error:e2}=await sb.from('system_state').upsert({id:currentChannel,status:'voting',match_id:matchId,match_a:{id:a.id,image_url:a.image_url,filename:a.filename,elo:a.elo,match_count:a.match_count,win_count:a.win_count},match_b:{id:b.id,image_url:b.image_url,filename:b.filename,elo:b.elo,match_count:b.match_count,win_count:b.win_count},round_number:roundNum,updated_at:new Date().toISOString()});if(e2){showToast('開始回合失敗：'+e2.message,'err');return;}showToast(currentChannel+' 第 '+roundNum+' 回合開始！');await fetchState();}
+async function endRound(){if(!currentState||currentState.status!=='voting')return;const{data:votes}=await sb.from('votes').select('choice').eq('match_id',currentState.match_id);const cA=votes?.filter(v=>v.choice==='A').length||0;const cB=votes?.filter(v=>v.choice==='B').length||0;const w=cA>=cB?'A':'B';const ma=currentState.match_a;const mb=currentState.match_b;const{newA,newB}=calcElo(ma.elo,mb.elo,w);await sb.from('works').update({elo:newA,match_count:(ma.match_count||0)+1,win_count:(ma.win_count||0)+(w==='A'?1:0)}).eq('id',ma.id);await sb.from('works').update({elo:newB,match_count:(mb.match_count||0)+1,win_count:(mb.win_count||0)+(w==='B'?1:0)}).eq('id',mb.id);await sb.from('system_state').update({status:'waiting',match_id:null,match_a:null,match_b:null,updated_at:new Date().toISOString()}).eq('id',currentChannel);showToast('回合結算！勝方：'+(w==='A'?ma.filename:mb.filename)+'（A:'+cA+' vs B:'+cB+'）');await fetchState();loadWorks();}
+async function endThenStart(){await endRound();await startRound();}
+async function resetChannel(){if(!confirm('確定要清除【'+currentChannel+'】所有作品與投票資料嗎？這個動作無法還原！'))return;const safeFolder=CHANNEL_FOLDERS[currentChannel]||toSafeKey(currentChannel);const{data:files}=await sb.storage.from(STORAGE_BUCKET).list(safeFolder);if(files&&files.length>0){const paths=files.map(f=>safeFolder+'/'+f.name);await sb.storage.from(STORAGE_BUCKET).remove(paths);}await sb.from('works').delete().eq('channel',currentChannel);await sb.from('votes').delete().eq('channel',currentChannel);await sb.from('system_state').upsert({id:currentChannel,status:'waiting',match_id:null,match_a:null,match_b:null,round_number:0,updated_at:new Date().toISOString()});showToast(currentChannel+' 資料已重設');await fetchState();loadWorks();}
+async function fetchState(){const{data,error}=await sb.from('system_state').select('*').eq('id',currentChannel).single();if(error){currentState=null;renderState();return;}currentState=data;renderState();if(data.status==='voting')updateVoteCounts();}
+async function updateVoteCounts(){if(!currentState||!currentState.match_id)return;const{data:votes}=await sb.from('votes').select('choice').eq('match_id',currentState.match_id);document.getElementById('votes-a').textContent=votes?.filter(v=>v.choice==='A').length||0;document.getElementById('votes-b').textContent=votes?.filter(v=>v.choice==='B').length||0;}
+function renderState(){const badge=document.getElementById('status-badge'),matchArea=document.getElementById('match-area'),btnStart=document.getElementById('btn-start'),btnEnd=document.getElementById('btn-end'),btnEndStart=document.getElementById('btn-end-start'),roundLabel=document.getElementById('round-num-label');if(!currentState){badge.textContent='等待中';badge.className='badge-waiting';matchArea.style.display='none';btnStart.disabled=false;btnEnd.disabled=true;btnEndStart.disabled=true;roundLabel.textContent='';return;}if(currentState.status==='voting'){badge.textContent='投票中';badge.className='badge-voting';matchArea.style.display='block';btnStart.disabled=true;btnEnd.disabled=false;btnEndStart.disabled=false;roundLabel.textContent='第 '+currentState.round_number+' 回合';const ma=currentState.match_a||{},mb=currentState.match_b||{};document.getElementById('img-a').src=ma.image_url||'';document.getElementById('img-b').src=mb.image_url||'';document.getElementById('name-a').textContent=ma.filename||'—';document.getElementById('name-b').textContent=mb.filename||'—';}else{badge.textContent='等待中';badge.className='badge-waiting';matchArea.style.display='none';btnStart.disabled=false;btnEnd.disabled=true;btnEndStart.disabled=true;roundLabel.textContent=currentState.round_number>0?'已完成 '+currentState.round_number+' 回合':'';document.getElementById('votes-a').textContent='0';document.getElementById('votes-b').textContent='0';}}
+async function loadWorks(){const{data:works}=await sb.from('works').select('*').eq('channel',currentChannel).order('elo',{ascending:false});if(!works)return;const grid=document.getElementById('works-grid');grid.innerHTML='';works.forEach(w=>{const div=document.createElement('div');div.className='work-thumb';div.innerHTML='<img src="'+w.image_url+'" loading="lazy" alt="'+w.filename+'"><div class="info"><div class="name">'+w.filename+'</div><div class="elo">ELO: '+w.elo+' | '+w.match_count+'場</div></div>';grid.appendChild(div);});const tbody=document.getElementById('rank-tbody');tbody.innerHTML='';works.forEach((w,i)=>{const rank=i+1,rc=rank<=3?'rank-'+rank:'',wr=w.match_count>0?Math.round(w.win_count/w.match_count*100)+'%':'—';const tr=document.createElement('tr');tr.innerHTML='<td class="rank-num '+rc+'">'+rank+'</td><td>'+w.filename+'</td><td>'+w.elo+'</td><td>'+w.match_count+'</td><td>'+w.win_count+'</td><td>'+wr+'</td>';tbody.appendChild(tr);});}
+function updateQRCode(){const url=STUDENT_BASE_URL+'?ch='+encodeURIComponent(currentChannel);document.getElementById('qr-ch-label').textContent=currentChannel;document.getElementById('qr-url-label').textContent=url;const wrap=document.getElementById('qr-canvas-wrap');wrap.innerHTML='';new QRCode(wrap,{text:url,width:200,height:200,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});}
+function toggleQR(){document.getElementById('qr-drawer').classList.toggle('open');}
+document.addEventListener('click',function(e){const d=document.getElementById('qr-drawer'),t=document.getElementById('qr-tab');if(d.classList.contains('open')&&!d.contains(e.target)&&!t.contains(e.target))d.classList.remove('open');});
+(async()=>{updateQRCode();await fetchState();await loadWorks();setInterval(async()=>{await fetchState();if(currentState?.status==='voting')updateVoteCounts();},3000);setInterval(loadWorks,10000);})();
 </script>
 </body>
 </html>
