@@ -174,6 +174,7 @@
 </div>
 
 <h1>🎨 紅白對抗賽 — 老師控制台</h1>
+<div style="text-align:center;font-size:0.75rem;color:#555;margin-top:-8px;margin-bottom:4px;">v1.0.1</div>
 
 <!-- 頻道切換 -->
 <div id="channel-bar">
@@ -299,6 +300,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── 頻道設定 ──
 const CHANNELS = ['C班', 'D班'];
+const CHANNEL_FOLDERS = { 'C班': 'class_C', 'D班': 'class_D' }; // Storage 用 ASCII 資料夾名
 const STUDENT_BASE_URL = 'https://oskens1.github.io/new_pk_draw/';
 let currentChannel = 'C班';
 
@@ -406,8 +408,9 @@ async function uploadOnePdf(file) {
 
     const displayName = filenameWithoutExt(file.name);
     const safeKey = toSafeKey(displayName);
-    // 以頻道為子資料夾，避免不同班同學號衝突
-    const imgPath = currentChannel + '/' + safeKey + '.jpg';
+    // 以頻道為子資料夾，避免不同班同學號衝突；資料夾名稱用 ASCII（Storage 不接受中文）
+    const safeFolder = CHANNEL_FOLDERS[currentChannel] || toSafeKey(currentChannel);
+    const imgPath = safeFolder + '/' + safeKey + '.jpg';
     const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(imgPath, blob, {
       contentType: 'image/jpeg', upsert: true
     });
@@ -516,10 +519,11 @@ async function endThenStart() {
 async function resetChannel() {
   if (!confirm(`確定要清除【${currentChannel}】所有作品與投票資料嗎？這個動作無法還原！`)) return;
 
-  // 只刪此頻道在 Storage 的圖片（子資料夾）
-  const { data: files } = await sb.storage.from(STORAGE_BUCKET).list(currentChannel);
+  // 只刪此頻道在 Storage 的圖片（子資料夾，用 ASCII 資料夾名）
+  const safeFolder = CHANNEL_FOLDERS[currentChannel] || toSafeKey(currentChannel);
+  const { data: files } = await sb.storage.from(STORAGE_BUCKET).list(safeFolder);
   if (files && files.length > 0) {
-    const paths = files.map(f => `${currentChannel}/${f.name}`);
+    const paths = files.map(f => `${safeFolder}/${f.name}`);
     await sb.storage.from(STORAGE_BUCKET).remove(paths);
   }
 
