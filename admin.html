@@ -111,7 +111,7 @@
 <div id="qr-drawer"><h3>📱 學生投票頁</h3><div class="qr-ch" id="qr-ch-label">C班</div><div class="qr-url" id="qr-url-label"></div><div id="qr-canvas-wrap"></div><div class="qr-hint">掃描後即可進入投票頁面</div></div>
 <script src="config.js"></script>
 <script>
-const PW_HASH='00264e1405a7bc5eea1b8c0d272a4d87fa1653e007aea7ec00015208c480a51c';
+const PW_HASH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 async function tryLogin(){const pw=document.getElementById('pw-input').value;const h=await sha256(pw);if(h===PW_HASH){sessionStorage.setItem('admin_auth','1');document.getElementById('login-overlay').style.display='none';}else{document.getElementById('login-err').textContent='密碼錯誤，請再試一次';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();}}
 document.getElementById('login-btn').addEventListener('click',tryLogin);
